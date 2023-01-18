@@ -5,7 +5,7 @@ import axios from '@services/local'
 import { getErrorUrl } from '@utils/index'
 import { jwtVerify } from 'jose'
 import cookie from 'cookie'
-import { UserType } from '@app-types/user'
+import { UserTokenType } from '@app-types/user'
 import { ProductsInterface } from '@app-types/products'
 import Head from 'next/head'
 import { Formik, Field } from 'formik'
@@ -59,7 +59,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
 interface Props {
   product_id: string
-  user: UserType
+  user: UserTokenType
   product: ProductsInterface
 }
 

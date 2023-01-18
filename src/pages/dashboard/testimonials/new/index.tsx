@@ -4,9 +4,10 @@ import Head from 'next/head'
 import { Formik, Field } from 'formik'
 import * as Yup from 'yup'
 import service from '@services/local'
-import { AttributesType } from '@app-types/products'
 import { BsTrash } from 'react-icons/bs'
 import { useRouter } from 'next/router'
+import { GetServerSideProps } from 'next'
+import cookie from 'cookie'
 
 import {
   Flex,
@@ -18,18 +19,12 @@ import {
   Input,
   Textarea,
   VStack,
-  Select,
-  Switch,
-  Box,
   Image,
   IconButton,
 } from '@chakra-ui/react'
 import Header from '@components/Header'
 import Sidebar from '@components/Sidebar'
 import Content from '@components/Content'
-
-import { GetServerSideProps } from 'next'
-import cookie from 'cookie'
 import { jwtVerify } from 'jose'
 import { UserTokenType } from '@app-types/user'
 
@@ -63,13 +58,12 @@ interface Props {
   user: UserTokenType
 }
 
-const NewProduct = ({ user }: Props) => {
+const NewTestimonial = ({ user }: Props) => {
   console.log(user)
   const [selectedFile, setSelectedFile] = useState<any>()
   const [preview, setPreview] = useState<any>()
   const [inputKey, setInputKey] = useState<any>()
   const [loadingBtn, setLoadingBtn] = useState(false)
-
   const { push } = useRouter()
 
   useEffect(() => {
@@ -106,25 +100,17 @@ const NewProduct = ({ user }: Props) => {
     if (file?.size / 1024 / 1024 < 1) {
       const base64 = await convertToBase64(file)
       setFieldValue(`images[0].code`, base64)
-      setFieldValue(`images[0].principal`, true)
+      setFieldValue(`images[0].principal`, false)
     } else {
       console.log('Image size must be of 1MB or less')
     }
   }
-  const createPorduct = async (data: any) => {
+  const createTestimonial = async (data: any) => {
     setLoadingBtn(true)
-    const emptyAttributes = data.attributes.filter(
-      (attribute: AttributesType) => attribute.key && attribute.value
-    )
-    const newData = {
-      ...data,
-      attributes: emptyAttributes,
-    }
     try {
-      await service.post('/products/new', newData)
-      push('/dashboard/products')
+      await service.post('/testimonials/new', data)
+      push('/dashboard/testimonials')
     } catch (error) {
-      setLoadingBtn(false)
       console.log(error)
     }
   }
@@ -133,21 +119,18 @@ const NewProduct = ({ user }: Props) => {
       .min(5, 'Debe contener al menos 5 carácteres')
       .max(50, 'El nombre es muy largo')
       .required('Este campo es requerido'),
-    description: Yup.string()
+    occupation: Yup.string()
+      .min(5, 'Debe contener al menos 5 carácteres')
+      .required('Este campo es requerido'),
+    comment: Yup.string()
       .min(4, 'Debe contener al menos 20 carácteres')
       .required('Este campo es requerido'),
-    body: Yup.string()
-      .min(4, 'Debe contener al menos 20 carácteres')
-      .required('Este campo es requerido'),
-    is_available: Yup.boolean(),
-    condition: Yup.string().required('Este campo es requerido'),
-    featured: Yup.boolean(),
   })
   return (
     <>
       <Head>
-        <title>Casa Viano - Nuevo Producto</title>
-        <meta name="description" content="Casa Viano - Nuevo Producto" />
+        <title>Casa Viano - Nuevo Testimonio</title>
+        <meta name="description" content="Casa Viano - Nuevo Testimonio" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
@@ -156,29 +139,15 @@ const NewProduct = ({ user }: Props) => {
         <Sidebar />
         <Content>
           <Flex justifyContent="space-between" alignItems="center" mb="30px">
-            <Heading fontSize="4xl">Nuevo Producto</Heading>
+            <Heading fontSize="4xl">Nuevo Testimonio</Heading>
           </Flex>
           <Formik
             initialValues={{
               name: '',
-              description: '',
-              body: '',
-              is_available: false,
-              condition: '',
-              attributes: [
-                { key: '', value: '' },
-                { key: '', value: '' },
-                { key: '', value: '' },
-                { key: '', value: '' },
-                { key: '', value: '' },
-                { key: '', value: '' },
-                { key: '', value: '' },
-                { key: '', value: '' },
-                { key: '', value: '' },
-                { key: '', value: '' },
-              ],
+              occupation: '',
+              comment: '',
             }}
-            onSubmit={(values) => createPorduct(values)}
+            onSubmit={(values) => createTestimonial(values)}
             validationSchema={validationSchema}
           >
             {({ handleSubmit, errors, touched, setFieldValue }) => (
@@ -197,100 +166,34 @@ const NewProduct = ({ user }: Props) => {
                     <FormErrorMessage>{errors.name}</FormErrorMessage>
                   </FormControl>
                   <FormControl
-                    isInvalid={!!errors.description && touched.description}
+                    isInvalid={!!errors.occupation && touched.occupation}
                   >
-                    <FormLabel htmlFor="description">Descripción</FormLabel>
+                    <FormLabel htmlFor="occupation">Ocupación</FormLabel>
                     <Field
                       as={Textarea}
                       borderColor="gray.100"
                       _hover={{
                         bg: 'white',
                       }}
-                      name="description"
+                      name="occupation"
                     />
-                    <FormErrorMessage>{errors.description}</FormErrorMessage>
+                    <FormErrorMessage>{errors.occupation}</FormErrorMessage>
                   </FormControl>
-                  <FormControl isInvalid={!!errors.body && touched.body}>
-                    <FormLabel htmlFor="body">Resumen</FormLabel>
+                  <FormControl isInvalid={!!errors.comment && touched.comment}>
+                    <FormLabel htmlFor="comment">Comentario</FormLabel>
                     <Field
                       as={Textarea}
                       borderColor="gray.100"
                       _hover={{
                         bg: 'white',
                       }}
-                      name="body"
+                      name="comment"
                     />
-                    <FormErrorMessage>{errors.body}</FormErrorMessage>
-                  </FormControl>
-                  <FormControl
-                    isInvalid={!!errors.condition && touched.condition}
-                  >
-                    <FormLabel htmlFor="condition">Condición</FormLabel>
-                    <Field
-                      as={Select}
-                      borderColor="gray.100"
-                      _hover={{
-                        bg: 'white',
-                      }}
-                      bg="white"
-                      name="condition"
-                      size="lg"
-                    >
-                      <option value="">Seleccionar</option>
-                      <option value="new">Nuevo</option>
-                      <option value="used">Usado</option>
-                    </Field>
-                    <FormErrorMessage>{errors.condition}</FormErrorMessage>
+                    <FormErrorMessage>{errors.comment}</FormErrorMessage>
                   </FormControl>
 
-                  {['0', 1, 2, 3, 4, 5, 6, 7, 8, 9].map((id) => {
-                    return (
-                      <FormControl key={id}>
-                        <FormLabel htmlFor={`attributes[${id}]`} mb="0">
-                          Atributos
-                        </FormLabel>
-                        <Box display="flex">
-                          <Field
-                            flex="1"
-                            as={Input}
-                            name={`attributes[${id}].key`}
-                            placeholder="Titulo"
-                            mr="20px"
-                          />
-                          <Field
-                            flex="2"
-                            as={Textarea}
-                            name={`attributes[${id}].value`}
-                            placeholder="Descripción"
-                          />
-                        </Box>
-                      </FormControl>
-                    )
-                  })}
-                  <FormControl>
-                    <FormLabel htmlFor="is_available" mb="0">
-                      Producto disponible
-                    </FormLabel>
-                    <Field
-                      as={Switch}
-                      name="is_available"
-                      size="lg"
-                      colorScheme="teal"
-                    />
-                  </FormControl>
-                  <FormControl pt="20px" pb="20px">
-                    <FormLabel htmlFor="featured" mb="0">
-                      Producto destacado
-                    </FormLabel>
-                    <Field
-                      as={Switch}
-                      name="featured"
-                      size="lg"
-                      colorScheme="teal"
-                    />
-                  </FormControl>
                   <FormControl maxW="400px">
-                    <FormLabel>Imagen Destacada</FormLabel>
+                    <FormLabel>Imagen</FormLabel>
                     <Input
                       type="file"
                       name="file"
@@ -338,13 +241,14 @@ const NewProduct = ({ user }: Props) => {
                     )}
                   </FormControl>
                   <Button
+                    disabled={!selectedFile}
+                    size="lg"
                     isLoading={loadingBtn}
                     loadingText="Subiendo"
-                    size="lg"
                     colorScheme="brand"
                     type="submit"
                   >
-                    Crear Producto
+                    Crear Testimonio
                   </Button>
                 </VStack>
               </form>
@@ -356,4 +260,4 @@ const NewProduct = ({ user }: Props) => {
   )
 }
 
-export default NewProduct
+export default NewTestimonial

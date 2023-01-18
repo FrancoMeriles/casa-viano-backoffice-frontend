@@ -32,7 +32,7 @@ import {
   AiOutlinePicture,
 } from 'react-icons/ai'
 import { jwtVerify } from 'jose'
-import { ProductsInterface } from '@app-types/products'
+import { TestimonialInterface } from '@app-types/testimonials'
 
 import { UserTokenType } from '@app-types/user'
 import { useRouter } from 'next/router'
@@ -40,7 +40,7 @@ import { useRouter } from 'next/router'
 export const getServerSideProps: GetServerSideProps = async (context) => {
   let data
   try {
-    const response = await axios.get(`/products`)
+    const response = await axios.get(`/testimonials`)
     data = response.data
   } catch (err) {
     return {
@@ -58,39 +58,46 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   return {
     props: {
       user: payload,
-      products: data.products,
+      testimonials: data.testimonials,
     },
   }
 }
 
 interface Props {
   user: UserTokenType
-  products: ProductsInterface[]
+  testimonials: TestimonialInterface[]
 }
 
-export default function Products({ user, products }: Props) {
-  const [idSelectedProduct, setIdSelectedProduct] = useState('')
+export default function Testimonials({ user, testimonials }: Props) {
+  const [idSelectedTestimonial, setIdSelectedTestimonial] = useState('')
+  const [loadingBtn, setLoadingBtn] = useState(false)
+
   const { isOpen, onOpen, onClose } = useDisclosure()
   const cancelRef = React.useRef(null)
 
   const { push } = useRouter()
   console.log(user)
-  const handleDeleteProduct = async () => {
+  const handleDeleteTestimonial = async () => {
+    setLoadingBtn(true)
     try {
-      await axios.post(`/products/delete/${idSelectedProduct}`)
+      await axios.post(`/testimonials/delete/${idSelectedTestimonial}`)
+      window.location.reload()
     } catch (error) {
       console.log(error)
     }
   }
   const handleCloseDialog = async () => {
-    setIdSelectedProduct('')
+    setIdSelectedTestimonial('')
     onClose()
   }
   return (
     <>
       <Head>
-        <title>Casa Viano - Dashboard Productos</title>
-        <meta name="description" content="Casa Viano - Dashboard Productos" />
+        <title>Casa Viano - Dashboard Testimonials</title>
+        <meta
+          name="description"
+          content="Casa Viano - Dashboard Testimonials"
+        />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
@@ -100,9 +107,9 @@ export default function Products({ user, products }: Props) {
         <Sidebar />
         <Content>
           <Flex justifyContent="space-between" alignItems="center" mb="30px">
-            <Heading fontSize="4xl">Productos</Heading>
+            <Heading fontSize="4xl">Testimonios</Heading>
             <Button
-              onClick={() => push('/dashboard/products/new')}
+              onClick={() => push('/dashboard/testimonials/new')}
               size="lg"
               colorScheme="brand"
               borderRadius="40px"
@@ -111,17 +118,14 @@ export default function Products({ user, products }: Props) {
                 color: 'brand.100',
               }}
             >
-              Nuevo Producto
+              Nuevo Testimonio
             </Button>
           </Flex>
 
-          {products.map((product) => {
-            const principalImage = product.images.find(
-              (image) => image.principal
-            )
+          {testimonials.map((testimonial) => {
             return (
               <Box
-                key={product._id}
+                key={testimonial._id}
                 display="flex"
                 alignItems="center"
                 justifyContent="space-between"
@@ -132,8 +136,8 @@ export default function Products({ user, products }: Props) {
               >
                 <Box display="flex" alignItems="center">
                   <Image
-                    src={principalImage?.path}
-                    alt={product.slug}
+                    src={testimonial.image?.path}
+                    alt={testimonial._id}
                     height="150px"
                     width="200px"
                     objectFit="cover"
@@ -148,13 +152,13 @@ export default function Products({ user, products }: Props) {
                     ml="20px"
                     noOfLines={3}
                   >
-                    {product.name}
+                    {testimonial.name}
                   </Heading>
                 </Box>
                 <Box>
                   <IconButton
                     onClick={() =>
-                      push(`/dashboard/products/edit/${product._id}`)
+                      push(`/dashboard/testimonials/edit/${testimonial._id}`)
                     }
                     as="a"
                     borderRadius="25px"
@@ -164,7 +168,7 @@ export default function Products({ user, products }: Props) {
                   />
                   <IconButton
                     onClick={() =>
-                      push(`/dashboard/products/images/${product._id}`)
+                      push(`/dashboard/testimonials/images/${testimonial._id}`)
                     }
                     as="a"
                     borderRadius="25px"
@@ -176,7 +180,7 @@ export default function Products({ user, products }: Props) {
                   />
                   <IconButton
                     onClick={() => {
-                      setIdSelectedProduct(product._id)
+                      setIdSelectedTestimonial(testimonial._id)
                       onOpen()
                     }}
                     as="a"
@@ -200,18 +204,20 @@ export default function Products({ user, products }: Props) {
             <AlertDialogOverlay>
               <AlertDialogContent>
                 <AlertDialogHeader fontSize="lg" fontWeight="bold">
-                  Borrar Producto
+                  Borrar Testimonio
                 </AlertDialogHeader>
 
                 <AlertDialogBody>
-                  ¿ Esta seguro que quiere borrar el producto ?
+                  ¿ Esta seguro que quiere borrar el testimonio ?
                 </AlertDialogBody>
 
                 <AlertDialogFooter>
                   <Button onClick={handleCloseDialog}>Cancelar</Button>
                   <Button
+                    isLoading={loadingBtn}
+                    loadingText="Borrando"
                     colorScheme="red"
-                    onClick={handleDeleteProduct}
+                    onClick={handleDeleteTestimonial}
                     ml={3}
                   >
                     Borrar

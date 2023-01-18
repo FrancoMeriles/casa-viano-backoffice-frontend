@@ -10,7 +10,7 @@ import Content from '@components/Content'
 import { Box, Heading } from '@chakra-ui/react'
 import { jwtVerify } from 'jose'
 
-import { UserType } from '@app-types/user'
+import { UserTokenType } from '@app-types/user'
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const { token } = cookie.parse(context.req.headers.cookie || '')
@@ -27,7 +27,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 }
 
 interface Props {
-  user: UserType
+  user: UserTokenType
 }
 
 export default function Home({ user }: Props) {

@@ -25,6 +25,7 @@ import {
   AlertDialogBody,
   AlertDialogFooter,
   useDisclosure,
+  Box,
 } from '@chakra-ui/react'
 import { Formik } from 'formik'
 import { BsTrash } from 'react-icons/bs'
@@ -38,7 +39,9 @@ import Content from '@components/Content'
 export const getServerSideProps: GetServerSideProps = async (context) => {
   let data
   try {
-    const response = await axios.get(`/product/${context?.query?.id}/images`)
+    const response = await axios.get(
+      `/testimonials/${context?.query?.id}/images`
+    )
     data = response.data
   } catch (err) {
     return {
@@ -53,9 +56,10 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     token,
     new TextEncoder().encode(process.env.JWT_SECRET)
   )
+  console.log(data)
   return {
     props: {
-      product_id: context.query.id,
+      testimonial_id: context.query.id,
       images: data.images,
       user: payload,
     },
@@ -63,7 +67,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 }
 
 interface Props {
-  product_id: string
+  testimonial_id: string
   user: UserTokenType
   images: ImagesType[]
 }
@@ -80,7 +84,7 @@ const convertToBase64 = (file: Blob) => {
   })
 }
 
-const Index = ({ product_id, user, images }: Props) => {
+const Index = ({ testimonial_id, user, images }: Props) => {
   console.log(user)
   const [selectedFile, setSelectedFile] = useState<any>()
   const [idSelectedImage, setIdSelectedImage] = useState('')
@@ -107,7 +111,9 @@ const Index = ({ product_id, user, images }: Props) => {
   const handleDeleteImage = async () => {
     setLoadingBtnDelete(true)
     try {
-      await axios.post(`/products/${product_id}/images/${idSelectedImage}`)
+      await axios.post(
+        `/testimonials/delete/${testimonial_id}/images/${idSelectedImage}`
+      )
       window.location.reload()
     } catch (error) {
       console.log(error)
@@ -144,9 +150,10 @@ const Index = ({ product_id, user, images }: Props) => {
     }
   }
   const uploadImage = async (data: any) => {
+    console.log(data)
     setLoadingBtn(true)
     try {
-      await axios.post(`/products/${product_id}/images`, data)
+      await axios.post(`/testimonials/${testimonial_id}/images/new`, data)
       window.location.reload()
     } catch (error) {
       console.log(error)
@@ -156,8 +163,11 @@ const Index = ({ product_id, user, images }: Props) => {
   return (
     <>
       <Head>
-        <title>Casa Viano - Editar Producto</title>
-        <meta name="description" content="Casa Viano - Editar Producto" />
+        <title>Casa Viano - Editar Imagenes Testimonios</title>
+        <meta
+          name="description"
+          content="Casa Viano - Editar Imagenes Testimonios"
+        />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
@@ -215,64 +225,70 @@ const Index = ({ product_id, user, images }: Props) => {
           <Formik initialValues={{}} onSubmit={(values) => uploadImage(values)}>
             {({ handleSubmit, setFieldValue }) => (
               <form onSubmit={handleSubmit}>
-                <FormControl maxW="400px">
-                  <FormLabel>Imágen</FormLabel>
-                  <Input
-                    type="file"
-                    name="file"
-                    key={inputKey || ''}
-                    onChange={(event) => {
-                      handleFileUpload(event, setFieldValue)
-                    }}
-                    sx={{
-                      '::file-selector-button': {
-                        height: 10,
-                        padding: 0,
-                        mr: 4,
-                        background: 'none',
-                        border: 'none',
-                        fontWeight: 'bold',
-                      },
-                    }}
-                  />
-                  {selectedFile && (
-                    <>
-                      <Image
-                        mt="15px"
-                        borderRadius="5px"
-                        src={preview}
-                        alt="Preview"
-                        position="relative"
-                      />
-
-                      <IconButton
-                        onClick={() => {
-                          setInputKey(Math.random().toString(36))
-                          setFieldValue(`images[0]`, null)
-                          setSelectedFile(undefined)
+                {!images ? (
+                  <>
+                    <FormControl maxW="400px">
+                      <FormLabel>Imágen</FormLabel>
+                      <Input
+                        type="file"
+                        name="file"
+                        key={inputKey || ''}
+                        onChange={(event) => {
+                          handleFileUpload(event, setFieldValue)
                         }}
-                        position="absolute"
-                        bottom="3"
-                        borderRadius="50px"
-                        right="3"
-                        bg="gray.100"
-                        aria-label="Eliminar"
-                        icon={<BsTrash color="red" fontSize="1.25rem" />}
+                        sx={{
+                          '::file-selector-button': {
+                            height: 10,
+                            padding: 0,
+                            mr: 4,
+                            background: 'none',
+                            border: 'none',
+                            fontWeight: 'bold',
+                          },
+                        }}
                       />
-                    </>
-                  )}
-                </FormControl>
-                <Button
-                  isLoading={loadingBtn}
-                  loadingText="Subiendo"
-                  mt="20px"
-                  disabled={!selectedFile}
-                  size="lg"
-                  colorScheme="brand"
-                  type="submit"
-                >
-                  Subir Imagen
-                </Button>
+                      {selectedFile && (
+                        <>
+                          <Image
+                            mt="15px"
+                            borderRadius="5px"
+                            src={preview}
+                            alt="Preview"
+                            position="relative"
+                          />
+
+                          <IconButton
+                            onClick={() => {
+                              setInputKey(Math.random().toString(36))
+                              setFieldValue(`images[0]`, null)
+                              setSelectedFile(undefined)
+                            }}
+                            position="absolute"
+                            bottom="3"
+                            borderRadius="50px"
+                            right="3"
+                            bg="gray.100"
+                            aria-label="Eliminar"
+                            icon={<BsTrash color="red" fontSize="1.25rem" />}
+                          />
+                        </>
+                      )}
+                    </FormControl>
+                    <Button
+                      isLoading={loadingBtn}
+                      loadingText="Subiendo"
+                      mt="20px"
+                      disabled={!selectedFile}
+                      size="lg"
+                      colorScheme="brand"
+                      type="submit"
+                    >
+                      Subir Imagen
+                    </Button>
+                  </>
+                ) : (
+                  <Box>Necesita borrar la imagen para subir una nueva</Box>
+                )}
               </form>
             )}
           </Formik>

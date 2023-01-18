@@ -1,6 +1,7 @@
 type ImagesType = {
   principal: boolean
   path: string
+  _id: string
 }
 
 export interface TestimonialInterface {

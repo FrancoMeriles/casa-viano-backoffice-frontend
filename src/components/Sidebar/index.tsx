@@ -5,8 +5,8 @@ const Sidebar = () => {
   const { asPath, push } = useRouter()
 
   const isProductos = asPath.includes('products')
-  const isTestimonios = asPath.includes('testimonios')
-  const isUsuarios = asPath.includes('usuarios')
+  const isTestimonios = asPath.includes('testimonials')
+  const isUsuarios = asPath.includes('users')
   return (
     <Box
       position="fixed"
@@ -59,7 +59,7 @@ const Sidebar = () => {
           fontSize="2xl"
           position="relative"
           onClick={() => {
-            push('/catalogo')
+            push('/dashboard/testimonials')
           }}
         >
           {isTestimonios && (
@@ -82,7 +82,7 @@ const Sidebar = () => {
           fontSize="2xl"
           position="relative"
           onClick={() => {
-            push('/contacto')
+            push('/dashboard/users')
           }}
         >
           {isUsuarios && (
