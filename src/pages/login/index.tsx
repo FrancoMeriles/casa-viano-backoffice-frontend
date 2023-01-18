@@ -30,13 +30,11 @@ export default function App() {
   const loginHandler = async (input: LoginType) => {
     setLoadingBtn(true)
     try {
-      const response = await service.post('/login', {
+      await service.post('/login', {
         ...input,
       })
-      console.log(response)
-      return push('/dashboard')
+      return push('/dashboard/products')
     } catch (error) {
-      console.log('errorsssss')
       console.log(error)
     }
   }

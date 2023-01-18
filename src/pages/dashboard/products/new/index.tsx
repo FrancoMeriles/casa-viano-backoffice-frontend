@@ -6,6 +6,7 @@ import * as Yup from 'yup'
 import service from '@services/local'
 import { AttributesType } from '@app-types/products'
 import { BsTrash } from 'react-icons/bs'
+import { useRouter } from 'next/router'
 
 import {
   Flex,
@@ -44,6 +45,7 @@ const NewProduct = () => {
   const [selectedFile, setSelectedFile] = useState<any>()
   const [preview, setPreview] = useState<any>()
   const [inputKey, setInputKey] = useState<any>()
+  const { push } = useRouter()
 
   useEffect(() => {
     if (!selectedFile) {
@@ -88,14 +90,16 @@ const NewProduct = () => {
     const emptyAttributes = data.attributes.filter(
       (attribute: AttributesType) => attribute.key && attribute.value
     )
-    console.log('createProduct')
-    console.log(emptyAttributes)
     const newData = {
       ...data,
       attributes: emptyAttributes,
     }
-    const response = await service.post('/products/new', newData)
-    console.log(response)
+    try {
+      await service.post('/products/new', newData)
+      push('/dashboard/products')
+    } catch (error) {
+      console.log(error)
+    }
   }
   const validationSchema = Yup.object({
     name: Yup.string()
@@ -191,7 +195,6 @@ const NewProduct = () => {
                     />
                     <FormErrorMessage>{errors.body}</FormErrorMessage>
                   </FormControl>
-
                   <FormControl
                     isInvalid={!!errors.condition && touched.condition}
                   >

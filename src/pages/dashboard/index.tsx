@@ -14,9 +14,10 @@ import { UserType } from '@app-types/user'
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const { token } = cookie.parse(context.req.headers.cookie || '')
-  const { payload } = await jwtVerify(token, new TextEncoder().encode('secret'))
-  console.log('en el dashboard get serverside prop')
-  console.log(process.env.JWT_SECRET)
+  const { payload } = await jwtVerify(
+    token,
+    new TextEncoder().encode(process.env.JWT_SECRET)
+  )
 
   return {
     props: {

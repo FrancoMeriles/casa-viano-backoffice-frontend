@@ -1,3 +1,4 @@
+import React, { useState } from 'react'
 import Head from 'next/head'
 
 import { GetServerSideProps } from 'next'
@@ -10,12 +11,31 @@ import Content from '@components/Content'
 import axios from '@services/local'
 import { getErrorUrl } from '@utils/index'
 
-import { Box, Heading, Image, IconButton, Button, Flex } from '@chakra-ui/react'
-import { AiOutlineEdit, AiOutlineDelete } from 'react-icons/ai'
+import {
+  Box,
+  Heading,
+  Image,
+  IconButton,
+  Button,
+  Flex,
+  AlertDialogOverlay,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogFooter,
+  AlertDialog,
+  AlertDialogBody,
+  useDisclosure,
+} from '@chakra-ui/react'
+import {
+  AiOutlineEdit,
+  AiOutlineDelete,
+  AiOutlinePicture,
+} from 'react-icons/ai'
 import { jwtVerify } from 'jose'
 import { ProductsInterface } from '@app-types/products'
 
 import { UserType } from '@app-types/user'
+import { useRouter } from 'next/router'
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   let data
@@ -31,7 +51,10 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     }
   }
   const { token } = cookie.parse(context.req.headers.cookie || '')
-  const { payload } = await jwtVerify(token, new TextEncoder().encode('secret'))
+  const { payload } = await jwtVerify(
+    token,
+    new TextEncoder().encode(process.env.JWT_SECRET)
+  )
   return {
     props: {
       user: payload,
@@ -46,8 +69,23 @@ interface Props {
 }
 
 export default function Products({ user, products }: Props) {
+  const [idSelectedProduct, setIdSelectedProduct] = useState('')
+  const { isOpen, onOpen, onClose } = useDisclosure()
+  const cancelRef = React.useRef(null)
+
+  const { push } = useRouter()
   console.log(user)
-  console.log(products)
+  const handleDeleteProduct = async () => {
+    try {
+      await axios.post(`/products/delete/${idSelectedProduct}`)
+    } catch (error) {
+      console.log(error)
+    }
+  }
+  const handleCloseDialog = async () => {
+    setIdSelectedProduct('')
+    onClose()
+  }
   return (
     <>
       <Head>
@@ -64,6 +102,7 @@ export default function Products({ user, products }: Props) {
           <Flex justifyContent="space-between" alignItems="center" mb="30px">
             <Heading fontSize="4xl">Productos</Heading>
             <Button
+              onClick={() => push('/dashboard/products/new')}
               size="lg"
               colorScheme="brand"
               borderRadius="40px"
@@ -114,7 +153,9 @@ export default function Products({ user, products }: Props) {
                 </Box>
                 <Box>
                   <IconButton
-                    onClick={() => console.log('click')}
+                    onClick={() =>
+                      push(`/dashboard/products/edit/${product._id}`)
+                    }
                     as="a"
                     borderRadius="25px"
                     cursor="pointer"
@@ -122,12 +163,26 @@ export default function Products({ user, products }: Props) {
                     icon={<AiOutlineEdit color="blue.900" fontSize="1.5rem" />}
                   />
                   <IconButton
-                    onClick={() => console.log('click')}
+                    onClick={() =>
+                      push(`/dashboard/products/images/${product._id}`)
+                    }
                     as="a"
                     borderRadius="25px"
                     cursor="pointer"
                     aria-label="Borrar"
-                    ml="10px"
+                    icon={
+                      <AiOutlinePicture color="blue.900" fontSize="1.5rem" />
+                    }
+                  />
+                  <IconButton
+                    onClick={() => {
+                      setIdSelectedProduct(product._id)
+                      onOpen()
+                    }}
+                    as="a"
+                    borderRadius="25px"
+                    cursor="pointer"
+                    aria-label="Borrar"
                     mr="10px"
                     icon={
                       <AiOutlineDelete color="blue.900" fontSize="1.5rem" />
@@ -137,6 +192,34 @@ export default function Products({ user, products }: Props) {
               </Box>
             )
           })}
+          <AlertDialog
+            leastDestructiveRef={cancelRef}
+            isOpen={isOpen}
+            onClose={onClose}
+          >
+            <AlertDialogOverlay>
+              <AlertDialogContent>
+                <AlertDialogHeader fontSize="lg" fontWeight="bold">
+                  Borrar Producto
+                </AlertDialogHeader>
+
+                <AlertDialogBody>
+                  ¿ Esta seguro que quiere borrar el producto ?
+                </AlertDialogBody>
+
+                <AlertDialogFooter>
+                  <Button onClick={handleCloseDialog}>Cancelar</Button>
+                  <Button
+                    colorScheme="red"
+                    onClick={handleDeleteProduct}
+                    ml={3}
+                  >
+                    Borrar
+                  </Button>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialogOverlay>
+          </AlertDialog>
         </Content>
       </main>
     </>

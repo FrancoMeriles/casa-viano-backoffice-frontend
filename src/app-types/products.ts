@@ -4,6 +4,7 @@ export type AttributesType = {
 }
 
 export type ImagesType = {
+  _id: string
   principal: boolean
   path: string
   code: string

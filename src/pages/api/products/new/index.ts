@@ -22,8 +22,6 @@ export default async function handler(
       },
       { headers: { Authorization: `Bearer ${req.cookies.token}` } }
     )
-    console.log('product response')
-    console.log(productResponse)
     const imagesResponse = await service.put(
       `/products/${productResponse?.data?.product?._id}/images`,
       {
@@ -31,11 +29,10 @@ export default async function handler(
       },
       { headers: { Authorization: `Bearer ${req.cookies.token}` } }
     )
-    console.log('images response')
-    console.log(imagesResponse)
-    res.status(200).json({ ...productResponse.data })
+    res
+      .status(200)
+      .json({ product: productResponse.data, images: imagesResponse.data })
   } catch (err) {
-    console.log('fallop')
     console.log(err)
     res.status(err.response.status).json(getErrorResponse(err))
   }

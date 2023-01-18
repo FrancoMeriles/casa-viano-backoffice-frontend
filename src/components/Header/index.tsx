@@ -27,7 +27,6 @@ const Header = () => {
       await service.post('/logout')
       push('/login')
     } catch (error) {
-      console.log('errores')
       console.log(error)
     }
     setLoaderState({ show: false })

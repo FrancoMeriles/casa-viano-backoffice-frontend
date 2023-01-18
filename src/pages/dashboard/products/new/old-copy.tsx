@@ -60,14 +60,11 @@ const NewProduct = () => {
     const emptyAttributes = data.attributes.filter(
       (attribute: AttributesType) => attribute.key && attribute.value
     )
-    console.log('createProduct')
-    console.log(emptyAttributes)
     const newData = {
       ...data,
       attributes: emptyAttributes,
     }
-    const response = await service.post('/products/new', newData)
-    console.log(response)
+    await service.post('/products/new', newData)
   }
   const validationSchema = Yup.object({
     name: Yup.string()
