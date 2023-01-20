@@ -8,7 +8,7 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  req.body.images[0].principal = req.body.principal
+  req.body.images[0].principal = req.body.principal || false
   try {
     const imageResponse = await service.put(
       `/products/${req.query.id}/images`,
