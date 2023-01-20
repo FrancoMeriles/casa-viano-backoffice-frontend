@@ -15,8 +15,13 @@ import { BiLogOutCircle } from 'react-icons/bi'
 import service from '@services/local'
 import useLoader from '@hooks/useLoader'
 import { useRouter } from 'next/router'
+import { UserTokenType } from '@app-types/user'
 
-const Header = () => {
+interface Props {
+  user: UserTokenType
+}
+
+const Header = ({ user }: Props) => {
   const { isOpen, onOpen, onClose } = useDisclosure()
   const { setLoaderState } = useLoader()
   const { push } = useRouter()
@@ -53,7 +58,7 @@ const Header = () => {
         alignItems="center"
         display="flex"
       >
-        Header
+        {user.sub}
         <IconButton
           onClick={logout}
           as="a"

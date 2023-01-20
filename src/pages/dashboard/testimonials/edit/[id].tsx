@@ -62,7 +62,6 @@ interface Props {
 }
 
 const EditTestimonial = ({ testimonial_id, user, testimonial }: Props) => {
-  console.log(user)
   const [loadingBtn, setLoadingBtn] = useState(false)
   const { push } = useRouter()
 
@@ -95,7 +94,7 @@ const EditTestimonial = ({ testimonial_id, user, testimonial }: Props) => {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <Header />
+      <Header user={user} />
       <main>
         <Sidebar />
         <Content>

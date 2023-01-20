@@ -25,8 +25,11 @@ import {
   AlertDialogBody,
   AlertDialogFooter,
   useDisclosure,
+  Switch,
+  Badge,
+  useToast,
 } from '@chakra-ui/react'
-import { Formik } from 'formik'
+import { Formik, Field } from 'formik'
 import { BsTrash } from 'react-icons/bs'
 
 import Head from 'next/head'
@@ -81,7 +84,6 @@ const convertToBase64 = (file: Blob) => {
 }
 
 const Index = ({ product_id, user, images }: Props) => {
-  console.log(user)
   const [selectedFile, setSelectedFile] = useState<any>()
   const [idSelectedImage, setIdSelectedImage] = useState('')
   const [preview, setPreview] = useState<any>()
@@ -89,7 +91,10 @@ const Index = ({ product_id, user, images }: Props) => {
   const [loadingBtn, setLoadingBtn] = useState(false)
   const [loadingBtnDelete, setLoadingBtnDelete] = useState(false)
   const { isOpen, onOpen, onClose } = useDisclosure()
+  const toast = useToast()
   const cancelRef = React.useRef(null)
+  const hasImageFeatured =
+    images && images.length > 0 && images.some((image: any) => image.principal)
 
   useEffect(() => {
     if (!selectedFile) {
@@ -141,6 +146,13 @@ const Index = ({ product_id, user, images }: Props) => {
     } else {
       setSelectedFile(undefined)
       console.log('Image size must be of 1MB or less')
+      toast({
+        title: 'Imagen muy pesada',
+        description: 'El peso debe ser menos de 1MB',
+        status: 'error',
+        duration: 9000,
+        isClosable: true,
+      })
     }
   }
   const uploadImage = async (data: any) => {
@@ -161,7 +173,7 @@ const Index = ({ product_id, user, images }: Props) => {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <Header />
+      <Header user={user} />
       <main>
         <Sidebar />
         <Content>
@@ -182,11 +194,24 @@ const Index = ({ product_id, user, images }: Props) => {
                     position="relative"
                   >
                     <Image
+                      width="100%"
                       height={400}
                       objectFit="cover"
                       src={image.path}
                       alt={image._id}
                     />
+                    {image.principal && (
+                      <Badge
+                        top="5"
+                        right="5"
+                        position="absolute"
+                        colorScheme="green"
+                        fontSize="1em"
+                        fontWeight="bold"
+                      >
+                        Destacada
+                      </Badge>
+                    )}
                     <IconButton
                       onClick={() => {
                         setIdSelectedImage(image._id)
@@ -212,7 +237,12 @@ const Index = ({ product_id, user, images }: Props) => {
           >
             <Heading fontSize="4xl">Subir Imágen</Heading>
           </Flex>
-          <Formik initialValues={{}} onSubmit={(values) => uploadImage(values)}>
+          <Formik
+            initialValues={{
+              principal: false,
+            }}
+            onSubmit={(values) => uploadImage(values)}
+          >
             {({ handleSubmit, setFieldValue }) => (
               <form onSubmit={handleSubmit}>
                 <FormControl maxW="400px">
@@ -262,6 +292,19 @@ const Index = ({ product_id, user, images }: Props) => {
                     </>
                   )}
                 </FormControl>
+                {!hasImageFeatured && (
+                  <FormControl pt="20px" pb="20px">
+                    <FormLabel htmlFor="principal" mb="0">
+                      Imagen destacada
+                    </FormLabel>
+                    <Field
+                      as={Switch}
+                      name="principal"
+                      size="lg"
+                      colorScheme="teal"
+                    />
+                  </FormControl>
+                )}
                 <Button
                   isLoading={loadingBtn}
                   loadingText="Subiendo"

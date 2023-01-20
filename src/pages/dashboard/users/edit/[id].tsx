@@ -33,8 +33,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         cookie: context.req.headers.cookie,
       },
     })
-    console.log('hereees')
-    console.log(response.data)
     data = response.data
   } catch (err) {
     return {
@@ -65,7 +63,6 @@ interface Props {
 }
 
 const NewUser = ({ user, user_id, userToken }: Props) => {
-  console.log(userToken)
   const [loadingBtn, setLoadingBtn] = useState(false)
   const { push } = useRouter()
 
@@ -85,9 +82,6 @@ const NewUser = ({ user, user_id, userToken }: Props) => {
       .max(50, 'El nombre es muy largo')
       .required('Este campo es requerido'),
     email: Yup.string().email().required('Este campo es requerido'),
-    password: Yup.string()
-      .min(8, 'Debe contener al menos 8 carácteres')
-      .required('Este campo es requerido'),
   })
   return (
     <>
@@ -97,7 +91,7 @@ const NewUser = ({ user, user_id, userToken }: Props) => {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <Header />
+      <Header user={userToken} />
       <main>
         <Sidebar />
         <Content>
@@ -108,7 +102,6 @@ const NewUser = ({ user, user_id, userToken }: Props) => {
             initialValues={{
               name: user.name,
               email: user.email,
-              password: '**********',
             }}
             onSubmit={(values) => editUser(values)}
             validationSchema={validationSchema}
@@ -141,22 +134,6 @@ const NewUser = ({ user, user_id, userToken }: Props) => {
                     />
                     <FormErrorMessage>{errors.email}</FormErrorMessage>
                   </FormControl>
-                  <FormControl
-                    isInvalid={!!errors.password && touched.password}
-                  >
-                    <FormLabel htmlFor="password">Contraseña</FormLabel>
-                    <Field
-                      as={Input}
-                      type="password"
-                      borderColor="gray.100"
-                      _hover={{
-                        bg: 'white',
-                      }}
-                      name="password"
-                    />
-                    <FormErrorMessage>{errors.password}</FormErrorMessage>
-                  </FormControl>
-
                   <Button
                     size="lg"
                     isLoading={loadingBtn}

@@ -76,7 +76,6 @@ export default function Testimonials({ user, testimonials }: Props) {
   const cancelRef = React.useRef(null)
 
   const { push } = useRouter()
-  console.log(user)
   const handleDeleteTestimonial = async () => {
     setLoadingBtn(true)
     try {
@@ -101,7 +100,7 @@ export default function Testimonials({ user, testimonials }: Props) {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <Header />
+      <Header user={user} />
 
       <main>
         <Sidebar />

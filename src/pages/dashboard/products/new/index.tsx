@@ -23,6 +23,7 @@ import {
   Box,
   Image,
   IconButton,
+  useToast,
 } from '@chakra-ui/react'
 import Header from '@components/Header'
 import Sidebar from '@components/Sidebar'
@@ -64,11 +65,11 @@ interface Props {
 }
 
 const NewProduct = ({ user }: Props) => {
-  console.log(user)
   const [selectedFile, setSelectedFile] = useState<any>()
   const [preview, setPreview] = useState<any>()
   const [inputKey, setInputKey] = useState<any>()
   const [loadingBtn, setLoadingBtn] = useState(false)
+  const toast = useToast()
 
   const { push } = useRouter()
 
@@ -108,7 +109,15 @@ const NewProduct = ({ user }: Props) => {
       setFieldValue(`images[0].code`, base64)
       setFieldValue(`images[0].principal`, true)
     } else {
+      setSelectedFile(undefined)
       console.log('Image size must be of 1MB or less')
+      toast({
+        title: 'Imagen muy pesada',
+        description: 'El peso debe ser menos de 1MB',
+        status: 'error',
+        duration: 9000,
+        isClosable: true,
+      })
     }
   }
   const createPorduct = async (data: any) => {
@@ -151,7 +160,7 @@ const NewProduct = ({ user }: Props) => {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <Header />
+      <Header user={user} />
       <main>
         <Sidebar />
         <Content>
@@ -338,6 +347,7 @@ const NewProduct = ({ user }: Props) => {
                     )}
                   </FormControl>
                   <Button
+                    disabled={!selectedFile}
                     isLoading={loadingBtn}
                     loadingText="Subiendo"
                     size="lg"

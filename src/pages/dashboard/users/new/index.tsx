@@ -42,7 +42,6 @@ interface Props {
 }
 
 const NewUser = ({ user }: Props) => {
-  console.log(user)
   const [loadingBtn, setLoadingBtn] = useState(false)
   const { push } = useRouter()
 
@@ -74,7 +73,7 @@ const NewUser = ({ user }: Props) => {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <Header />
+      <Header user={user} />
       <main>
         <Sidebar />
         <Content>

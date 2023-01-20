@@ -31,7 +31,6 @@ interface Props {
 }
 
 export default function Home({ user }: Props) {
-  console.log(user)
   return (
     <>
       <Head>
@@ -40,7 +39,7 @@ export default function Home({ user }: Props) {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <Header />
+      <Header user={user} />
 
       <main>
         <Sidebar />

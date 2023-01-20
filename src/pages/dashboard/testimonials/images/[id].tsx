@@ -26,6 +26,7 @@ import {
   AlertDialogFooter,
   useDisclosure,
   Box,
+  useToast,
 } from '@chakra-ui/react'
 import { Formik } from 'formik'
 import { BsTrash } from 'react-icons/bs'
@@ -56,7 +57,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     token,
     new TextEncoder().encode(process.env.JWT_SECRET)
   )
-  console.log(data)
   return {
     props: {
       testimonial_id: context.query.id,
@@ -85,7 +85,6 @@ const convertToBase64 = (file: Blob) => {
 }
 
 const Index = ({ testimonial_id, user, images }: Props) => {
-  console.log(user)
   const [selectedFile, setSelectedFile] = useState<any>()
   const [idSelectedImage, setIdSelectedImage] = useState('')
   const [preview, setPreview] = useState<any>()
@@ -94,6 +93,7 @@ const Index = ({ testimonial_id, user, images }: Props) => {
   const [loadingBtnDelete, setLoadingBtnDelete] = useState(false)
   const { isOpen, onOpen, onClose } = useDisclosure()
   const cancelRef = React.useRef(null)
+  const toast = useToast()
 
   useEffect(() => {
     if (!selectedFile) {
@@ -147,10 +147,16 @@ const Index = ({ testimonial_id, user, images }: Props) => {
     } else {
       setSelectedFile(undefined)
       console.log('Image size must be of 1MB or less')
+      toast({
+        title: 'Imagen muy pesada',
+        description: 'El peso debe ser menos de 1MB',
+        status: 'error',
+        duration: 9000,
+        isClosable: true,
+      })
     }
   }
   const uploadImage = async (data: any) => {
-    console.log(data)
     setLoadingBtn(true)
     try {
       await axios.post(`/testimonials/${testimonial_id}/images/new`, data)
@@ -171,7 +177,7 @@ const Index = ({ testimonial_id, user, images }: Props) => {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <Header />
+      <Header user={user} />
       <main>
         <Sidebar />
         <Content>

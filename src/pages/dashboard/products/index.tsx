@@ -74,7 +74,6 @@ export default function Products({ user, products }: Props) {
   const cancelRef = React.useRef(null)
 
   const { push } = useRouter()
-  console.log(user)
   const handleDeleteProduct = async () => {
     try {
       await axios.post(`/products/delete/${idSelectedProduct}`)
@@ -94,7 +93,7 @@ export default function Products({ user, products }: Props) {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <Header />
+      <Header user={user} />
 
       <main>
         <Sidebar />
@@ -115,83 +114,87 @@ export default function Products({ user, products }: Props) {
             </Button>
           </Flex>
 
-          {products.map((product) => {
-            const principalImage = product.images.find(
-              (image) => image.principal
-            )
-            return (
-              <Box
-                key={product._id}
-                display="flex"
-                alignItems="center"
-                justifyContent="space-between"
-                bg="gray.100"
-                boxShadow="xs"
-                mb="20px"
-                borderRadius="10px"
-              >
-                <Box display="flex" alignItems="center">
-                  <Image
-                    src={principalImage?.path}
-                    alt={product.slug}
-                    height="150px"
-                    width="200px"
-                    objectFit="cover"
-                    borderTopLeftRadius="10px"
-                    borderBottomLeftRadius="10px"
-                  />
-                  <Heading
-                    maxW="600px"
-                    fontSize="2xl"
-                    fontWeight="normal"
-                    lineHeight="30px"
-                    ml="20px"
-                    noOfLines={3}
-                  >
-                    {product.name}
-                  </Heading>
+          {products &&
+            products.length > 0 &&
+            products.map((product) => {
+              const principalImage = product.images.find(
+                (image) => image.principal
+              )
+              return (
+                <Box
+                  key={product._id}
+                  display="flex"
+                  alignItems="center"
+                  justifyContent="space-between"
+                  bg="gray.100"
+                  boxShadow="xs"
+                  mb="20px"
+                  borderRadius="10px"
+                >
+                  <Box display="flex" alignItems="center">
+                    <Image
+                      src={principalImage?.path}
+                      alt={product.slug}
+                      height="150px"
+                      width="200px"
+                      objectFit="cover"
+                      borderTopLeftRadius="10px"
+                      borderBottomLeftRadius="10px"
+                    />
+                    <Heading
+                      maxW="600px"
+                      fontSize="2xl"
+                      fontWeight="normal"
+                      lineHeight="30px"
+                      ml="20px"
+                      noOfLines={3}
+                    >
+                      {product.name}
+                    </Heading>
+                  </Box>
+                  <Box>
+                    <IconButton
+                      onClick={() =>
+                        push(`/dashboard/products/edit/${product._id}`)
+                      }
+                      as="a"
+                      borderRadius="25px"
+                      cursor="pointer"
+                      aria-label="Editar"
+                      icon={
+                        <AiOutlineEdit color="blue.900" fontSize="1.5rem" />
+                      }
+                    />
+                    <IconButton
+                      onClick={() =>
+                        push(`/dashboard/products/images/${product._id}`)
+                      }
+                      as="a"
+                      borderRadius="25px"
+                      cursor="pointer"
+                      aria-label="Borrar"
+                      icon={
+                        <AiOutlinePicture color="blue.900" fontSize="1.5rem" />
+                      }
+                    />
+                    <IconButton
+                      onClick={() => {
+                        setIdSelectedProduct(product._id)
+                        onOpen()
+                      }}
+                      as="a"
+                      borderRadius="25px"
+                      cursor="pointer"
+                      aria-label="Borrar"
+                      mr="10px"
+                      icon={
+                        <AiOutlineDelete color="blue.900" fontSize="1.5rem" />
+                      }
+                    />
+                  </Box>
                 </Box>
-                <Box>
-                  <IconButton
-                    onClick={() =>
-                      push(`/dashboard/products/edit/${product._id}`)
-                    }
-                    as="a"
-                    borderRadius="25px"
-                    cursor="pointer"
-                    aria-label="Editar"
-                    icon={<AiOutlineEdit color="blue.900" fontSize="1.5rem" />}
-                  />
-                  <IconButton
-                    onClick={() =>
-                      push(`/dashboard/products/images/${product._id}`)
-                    }
-                    as="a"
-                    borderRadius="25px"
-                    cursor="pointer"
-                    aria-label="Borrar"
-                    icon={
-                      <AiOutlinePicture color="blue.900" fontSize="1.5rem" />
-                    }
-                  />
-                  <IconButton
-                    onClick={() => {
-                      setIdSelectedProduct(product._id)
-                      onOpen()
-                    }}
-                    as="a"
-                    borderRadius="25px"
-                    cursor="pointer"
-                    aria-label="Borrar"
-                    mr="10px"
-                    icon={
-                      <AiOutlineDelete color="blue.900" fontSize="1.5rem" />
-                    }
-                  />
-                </Box>
-              </Box>
-            )
-          })}
+              )
+            })}
           <AlertDialog
             leastDestructiveRef={cancelRef}
             isOpen={isOpen}

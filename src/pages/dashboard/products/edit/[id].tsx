@@ -64,7 +64,6 @@ interface Props {
 }
 
 const Index = ({ product_id, user, product }: Props) => {
-  console.log(user)
   const [loadingBtn, setLoadingBtn] = useState(false)
 
   const createPorduct = async (data: any) => {
@@ -103,7 +102,7 @@ const Index = ({ product_id, user, product }: Props) => {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <Header />
+      <Header user={user} />
       <main>
         <Sidebar />
         <Content>
