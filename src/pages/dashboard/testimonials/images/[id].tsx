@@ -237,6 +237,7 @@ const Index = ({ testimonial_id, user, images }: Props) => {
                       <FormLabel>Imágen</FormLabel>
                       <Input
                         type="file"
+                        accept="image/jpeg"
                         name="file"
                         key={inputKey || ''}
                         onChange={(event) => {

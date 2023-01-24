@@ -5,10 +5,12 @@ import {
   DrawerOverlay,
   DrawerContent,
   DrawerCloseButton,
-  DrawerHeader,
+  DrawerFooter,
+  Image,
   DrawerBody,
   useDisclosure,
   Container,
+  Link,
 } from '@chakra-ui/react'
 import { FaBars } from 'react-icons/fa'
 import { BiLogOutCircle } from 'react-icons/bi'
@@ -24,7 +26,12 @@ interface Props {
 const Header = ({ user }: Props) => {
   const { isOpen, onOpen, onClose } = useDisclosure()
   const { setLoaderState } = useLoader()
-  const { push } = useRouter()
+  const { push, asPath } = useRouter()
+
+  const isProductos = asPath.includes('products')
+  const isTestimonios = asPath.includes('testimonials')
+  const isUsuarios = asPath.includes('users')
+  const isContacto = asPath.includes('contacts')
 
   const logout = async () => {
     setLoaderState({ show: true })
@@ -93,9 +100,110 @@ const Header = ({ user }: Props) => {
         <DrawerOverlay />
         <DrawerContent>
           <DrawerCloseButton />
-          <DrawerHeader>Create your account</DrawerHeader>
-
-          <DrawerBody>Hola content</DrawerBody>
+          <DrawerBody display="flex" flexDirection="column" bg="brand.500">
+            <Link
+              mt="40px"
+              color="white"
+              fontWeight="bold"
+              fontSize="2xl"
+              position="relative"
+              onClick={() => {
+                push('/dashboard/products')
+              }}
+            >
+              {isProductos && (
+                <Box
+                  w="8px"
+                  height="34px"
+                  bg="white"
+                  left="-23px"
+                  as="span"
+                  position="absolute"
+                  display="inline-block"
+                />
+              )}
+              Productos
+            </Link>
+            <Link
+              mt="20px"
+              color="white"
+              fontWeight="bold"
+              fontSize="2xl"
+              position="relative"
+              onClick={() => {
+                push('/dashboard/testimonials')
+              }}
+            >
+              {isTestimonios && (
+                <Box
+                  w="8px"
+                  height="34px"
+                  bg="white"
+                  left="-23px"
+                  as="span"
+                  position="absolute"
+                  display="inline-block"
+                />
+              )}
+              Testimonios
+            </Link>
+            <Link
+              mt="20px"
+              color="white"
+              fontWeight="bold"
+              fontSize="2xl"
+              position="relative"
+              onClick={() => {
+                push('/dashboard/users')
+              }}
+            >
+              {isUsuarios && (
+                <Box
+                  w="8px"
+                  height="34px"
+                  bg="white"
+                  left="-23px"
+                  as="span"
+                  position="absolute"
+                  display="inline-block"
+                />
+              )}
+              Usuarios
+            </Link>
+            <Link
+              mt="20px"
+              color="white"
+              fontWeight="bold"
+              fontSize="2xl"
+              position="relative"
+              onClick={() => {
+                push('/dashboard/contacts')
+              }}
+            >
+              {isContacto && (
+                <Box
+                  w="8px"
+                  height="34px"
+                  bg="white"
+                  left="-23px"
+                  as="span"
+                  position="absolute"
+                  display="inline-block"
+                />
+              )}
+              Contactos
+            </Link>
+          </DrawerBody>
+          <DrawerFooter bg="brand.500">
+            <Image
+              onClick={() => push('/')}
+              margin="0 auto"
+              src="/casa-viano.svg"
+              alt="Casa Viano"
+              width="170px"
+              cursor="pointer"
+            />
+          </DrawerFooter>
         </DrawerContent>
       </Drawer>
     </Box>

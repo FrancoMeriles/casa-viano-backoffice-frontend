@@ -254,6 +254,7 @@ const Index = ({ product_id, user, images }: Props) => {
                     onChange={(event) => {
                       handleFileUpload(event, setFieldValue)
                     }}
+                    accept="image/jpeg"
                     sx={{
                       '::file-selector-button': {
                         height: 10,

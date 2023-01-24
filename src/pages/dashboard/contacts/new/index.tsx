@@ -7,6 +7,8 @@ import service from '@services/local'
 import { useRouter } from 'next/router'
 import { GetServerSideProps } from 'next'
 import cookie from 'cookie'
+import axios from '@services/local'
+import { getErrorUrl, translateTypesMessage } from '@utils/index'
 
 import {
   Flex,
@@ -17,22 +19,19 @@ import {
   FormErrorMessage,
   Input,
   VStack,
+  Textarea,
+  Select,
 } from '@chakra-ui/react'
 import Header from '@components/Header'
 import Sidebar from '@components/Sidebar'
 import Content from '@components/Content'
 import { jwtVerify } from 'jose'
-import { UserTokenType, UserType } from '@app-types/user'
-import { getErrorUrl } from '@utils/index'
+import { UserTokenType } from '@app-types/user'
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   let data
   try {
-    const response = await service.get(`/users/${context?.query?.id}`, {
-      headers: {
-        cookie: context.req.headers.cookie,
-      },
-    })
+    const response = await axios.get(`/messages/types`)
     data = response.data
   } catch (err) {
     return {
@@ -49,119 +48,127 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   )
   return {
     props: {
-      user_id: context.query.id,
-      user: data.user,
-      userToken: payload,
+      user: payload,
+      types: data.types,
     },
   }
 }
 
 interface Props {
-  user_id: string
-  userToken: UserTokenType
-  user: UserType
+  user: UserTokenType
+  types: string[]
 }
 
-const NewUser = ({ user, user_id, userToken }: Props) => {
+const NewMessage = ({ user, types }: Props) => {
+  console.log(types)
   const [loadingBtn, setLoadingBtn] = useState(false)
   const { push } = useRouter()
-  const editUser = async (data: any) => {
-    const newData = { ...data }
+
+  const createMessage = async (data: any) => {
     setLoadingBtn(true)
-    if (newData.password === '*********') {
-      delete newData.password
-    }
+    console.log(data)
     try {
-      await service.post(`/users/edit/${user_id}`, newData)
-      push('/dashboard/users')
+      await service.post('/messages/new', data)
+      push('/dashboard/contacts')
     } catch (error) {
       console.log(error)
       setLoadingBtn(false)
     }
   }
   const validationSchema = Yup.object({
-    name: Yup.string()
+    content: Yup.string()
       .min(5, 'Debe contener al menos 5 carácteres')
-      .max(50, 'El nombre es muy largo')
+      .max(20, 'El nombre es muy largo')
       .required('Este campo es requerido'),
-    email: Yup.string().email().required('Este campo es requerido'),
-    password: Yup.string().min(8, 'Debe contener al menos 8 carácteres'),
+    phone: Yup.number()
+      .typeError('Este campo tiene que ser solo números')
+      .required('Este campo es requerido'),
+    type: Yup.string().required('Este campo es requerido'),
   })
   return (
     <>
       <Head>
-        <title>Casa Viano - Editar Usuario</title>
-        <meta name="description" content="Casa Viano - Editar Usuario" />
+        <title>Casa Viano - Nuevo Mensaje</title>
+        <meta name="description" content="Casa Viano - Nuevo Mensaje" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <Header user={userToken} />
+      <Header user={user} />
       <main>
         <Sidebar />
         <Content>
           <Flex justifyContent="space-between" alignItems="center" mb="30px">
-            <Heading fontSize="4xl">Editar Usuario</Heading>
+            <Heading fontSize="4xl">Nuevo Mensaje</Heading>
           </Flex>
           <Formik
             initialValues={{
-              name: user.name,
-              email: user.email,
-              password: '*********',
+              content: '',
+              phone: '',
+              type: '',
             }}
-            onSubmit={(values) => editUser(values)}
+            onSubmit={(values) => createMessage(values)}
             validationSchema={validationSchema}
           >
             {({ handleSubmit, errors, touched }) => (
               <form onSubmit={handleSubmit}>
                 <VStack spacing={4} align="flex-start">
-                  <FormControl isInvalid={!!errors.name && touched.name}>
-                    <FormLabel htmlFor="name">Nombre</FormLabel>
+                  <FormControl isInvalid={!!errors.phone && touched.phone}>
+                    <FormLabel htmlFor="phone">Numero de teléfono</FormLabel>
                     <Field
                       as={Input}
                       borderColor="gray.100"
                       _hover={{
                         bg: 'white',
                       }}
-                      name="name"
+                      type="tel"
+                      name="phone"
                     />
-                    <FormErrorMessage>{errors.name}</FormErrorMessage>
+                    <FormErrorMessage>{errors.phone}</FormErrorMessage>
                   </FormControl>
-                  <FormControl isInvalid={!!errors.email && touched.email}>
-                    <FormLabel htmlFor="email">Email</FormLabel>
+                  <FormControl isInvalid={!!errors.content && touched.content}>
+                    <FormLabel htmlFor="content">Mensaje</FormLabel>
                     <Field
-                      as={Input}
-                      type="email"
+                      as={Textarea}
                       borderColor="gray.100"
                       _hover={{
                         bg: 'white',
                       }}
-                      name="email"
+                      name="content"
                     />
-                    <FormErrorMessage>{errors.email}</FormErrorMessage>
+                    <FormErrorMessage>{errors.content}</FormErrorMessage>
                   </FormControl>
-                  <FormControl
-                    isInvalid={!!errors.password && touched.password}
-                  >
-                    <FormLabel htmlFor="password">Contraseña</FormLabel>
+                  <FormControl isInvalid={!!errors.type && touched.type}>
+                    <FormLabel htmlFor="type">Tipo</FormLabel>
                     <Field
-                      as={Input}
-                      type="password"
+                      as={Select}
                       borderColor="gray.100"
                       _hover={{
                         bg: 'white',
                       }}
-                      name="password"
-                    />
-                    <FormErrorMessage>{errors.password}</FormErrorMessage>
+                      bg="white"
+                      name="type"
+                      size="lg"
+                    >
+                      <option value="">Seleccionar</option>
+                      {types &&
+                        types.length > 0 &&
+                        types.map((type) => (
+                          <option key={type} value={type}>
+                            {translateTypesMessage(type)}
+                          </option>
+                        ))}
+                    </Field>
+                    <FormErrorMessage>{errors.type}</FormErrorMessage>
                   </FormControl>
+
                   <Button
                     size="lg"
                     isLoading={loadingBtn}
-                    loadingText="Actualizando"
+                    loadingText="Subiendo"
                     colorScheme="brand"
                     type="submit"
                   >
-                    Editar Usuario
+                    Crear Mensaje
                   </Button>
                 </VStack>
               </form>
@@ -173,4 +180,4 @@ const NewUser = ({ user, user_id, userToken }: Props) => {
   )
 }
 
-export default NewUser
+export default NewMessage

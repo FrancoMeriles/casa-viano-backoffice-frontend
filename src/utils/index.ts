@@ -18,3 +18,15 @@ export const getErrorResponse = (err: any) => {
     data: err.response.data,
   }
 }
+
+export const translateTypesMessage = (type: string) => {
+  if (type === 'slider') {
+    return 'Slider'
+  }
+  if (type === 'product') {
+    return 'Producto'
+  }
+  if (type === 'whatsapp-icon') {
+    return 'Whatsapp Ícono'
+  }
+}

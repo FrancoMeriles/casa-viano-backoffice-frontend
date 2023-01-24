@@ -7,6 +7,7 @@ const Sidebar = () => {
   const isProductos = asPath.includes('products')
   const isTestimonios = asPath.includes('testimonials')
   const isUsuarios = asPath.includes('users')
+  const isContacto = asPath.includes('contact')
   return (
     <Box
       position="fixed"
@@ -97,6 +98,29 @@ const Sidebar = () => {
             />
           )}
           Usuarios
+        </Link>
+        <Link
+          mt="20px"
+          color="white"
+          fontWeight="bold"
+          fontSize="2xl"
+          position="relative"
+          onClick={() => {
+            push('/dashboard/contacts')
+          }}
+        >
+          {isContacto && (
+            <Box
+              w="8px"
+              height="34px"
+              bg="white"
+              left="-19px"
+              as="span"
+              position="absolute"
+              display="inline-block"
+            />
+          )}
+          Contacto
         </Link>
       </Box>
     </Box>

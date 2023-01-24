@@ -205,6 +205,7 @@ const NewTestimonial = ({ user }: Props) => {
                     <FormLabel>Imagen</FormLabel>
                     <Input
                       type="file"
+                      accept="image/jpeg"
                       name="file"
                       multiple
                       key={inputKey || ''}

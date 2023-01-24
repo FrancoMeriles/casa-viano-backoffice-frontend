@@ -302,6 +302,7 @@ const NewProduct = ({ user }: Props) => {
                     <FormLabel>Imagen Destacada</FormLabel>
                     <Input
                       type="file"
+                      accept="image/jpeg"
                       name="file"
                       multiple
                       key={inputKey || ''}

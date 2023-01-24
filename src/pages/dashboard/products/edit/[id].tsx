@@ -11,6 +11,7 @@ import Head from 'next/head'
 import { Formik, Field } from 'formik'
 import * as Yup from 'yup'
 import { AttributesType } from '@app-types/products'
+import { useRouter } from 'next/router'
 
 import {
   Flex,
@@ -65,6 +66,7 @@ interface Props {
 
 const Index = ({ product_id, user, product }: Props) => {
   const [loadingBtn, setLoadingBtn] = useState(false)
+  const { push } = useRouter()
 
   const createPorduct = async (data: any) => {
     setLoadingBtn(true)
@@ -77,7 +79,7 @@ const Index = ({ product_id, user, product }: Props) => {
       attributes: emptyAttributes,
     }
     await axios.post(`/products/edit/${product_id}`, newData)
-    window.location.reload()
+    push('/dashboard/products')
   }
   const validationSchema = Yup.object({
     name: Yup.string()
@@ -238,6 +240,7 @@ const Index = ({ product_id, user, product }: Props) => {
                     colorScheme="brand"
                     type="submit"
                     isLoading={loadingBtn}
+                    loadingText="Actualizando"
                   >
                     Actualizar Producto
                   </Button>
