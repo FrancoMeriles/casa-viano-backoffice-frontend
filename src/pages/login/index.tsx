@@ -13,6 +13,7 @@ import {
   Stack,
   Heading,
   useBreakpointValue,
+  useToast,
 } from '@chakra-ui/react'
 import * as Yup from 'yup'
 import service from '@services/local'
@@ -26,6 +27,7 @@ type LoginType = {
 export default function App() {
   const [loadingBtn, setLoadingBtn] = useState(false)
   const { push } = useRouter()
+  const toast = useToast()
 
   const loginHandler = async (input: LoginType) => {
     setLoadingBtn(true)
@@ -36,6 +38,14 @@ export default function App() {
       return push('/dashboard/products')
     } catch (error) {
       console.log(error)
+      toast({
+        title: 'Error al iniciar session',
+        description: error?.response?.data?.message,
+        status: 'error',
+        duration: 9000,
+        isClosable: true,
+      })
+      setLoadingBtn(false)
     }
   }
   const validationSchema = Yup.object({
