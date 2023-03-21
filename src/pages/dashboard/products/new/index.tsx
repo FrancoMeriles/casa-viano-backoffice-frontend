@@ -133,8 +133,16 @@ const NewProduct = ({ user }: Props) => {
       await service.post('/products/new', newData)
       push('/dashboard/products')
     } catch (error) {
+      console.log('akiiii')
+      console.log(error.response.data)
+      toast({
+        title: 'Error al crear el producto, revisar los campos faltantes',
+        description: error?.response?.data?.data?.message,
+        status: 'error',
+        duration: 9000,
+        isClosable: true,
+      })
       setLoadingBtn(false)
-      console.log(error)
     }
   }
   const validationSchema = Yup.object({
@@ -142,15 +150,11 @@ const NewProduct = ({ user }: Props) => {
       .min(5, 'Debe contener al menos 5 carácteres')
       .max(50, 'El nombre es muy largo')
       .required('Este campo es requerido'),
-    description: Yup.string()
-      .min(4, 'Debe contener al menos 20 carácteres')
-      .required('Este campo es requerido'),
-    body: Yup.string()
-      .min(4, 'Debe contener al menos 20 carácteres')
-      .required('Este campo es requerido'),
-    is_available: Yup.boolean(),
+    description: Yup.string().min(4, 'Debe contener al menos 20 carácteres'),
+    body: Yup.string().min(4, 'Debe contener al menos 20 carácteres'),
+    is_available: Yup.boolean().required('Este campo es requerido'),
     condition: Yup.string().required('Este campo es requerido'),
-    featured: Yup.boolean(),
+    featured: Yup.boolean().required('Este campo es requerido'),
   })
   return (
     <>
@@ -172,8 +176,9 @@ const NewProduct = ({ user }: Props) => {
               name: '',
               description: '',
               body: '',
-              is_available: false,
               condition: '',
+              is_available: false,
+              featured: false,
               attributes: [
                 { key: '', value: '' },
                 { key: '', value: '' },
@@ -297,6 +302,7 @@ const NewProduct = ({ user }: Props) => {
                       size="lg"
                       colorScheme="teal"
                     />
+                    <FormErrorMessage>{errors.featured}</FormErrorMessage>
                   </FormControl>
                   <FormControl maxW="400px">
                     <FormLabel>Imagen Destacada</FormLabel>

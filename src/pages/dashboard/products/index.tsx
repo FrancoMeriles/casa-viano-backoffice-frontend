@@ -33,6 +33,7 @@ import {
   Input,
   InputGroup,
   InputRightElement,
+  useToast,
 } from '@chakra-ui/react'
 import {
   AiOutlineEdit,
@@ -83,7 +84,10 @@ export default function Products({ user, products }: Props) {
   const { isOpen, onOpen, onClose } = useDisclosure()
   const cancelRef = React.useRef(null)
   const [query, setQuery] = useState('')
+  const [loadingBtn, setLoadingBtn] = useState(false)
+
   const { setLoaderState } = useLoader()
+  const toast = useToast()
   const handleChange = (event: {
     target: { value: React.SetStateAction<string> }
   }) => setQuery(event.target.value)
@@ -131,10 +135,20 @@ export default function Products({ user, products }: Props) {
   }
   const { push } = useRouter()
   const handleDeleteProduct = async () => {
+    setLoadingBtn(true)
     try {
       await axios.post(`/products/delete/${idSelectedProduct}`)
+      window.location.reload()
     } catch (error) {
+      toast({
+        title: 'Hubo un problema al borrar el producto',
+        description: 'Por favor intenta nuevamente',
+        status: 'error',
+        duration: 9000,
+        isClosable: true,
+      })
       console.log(error)
+      setLoadingBtn(false)
     }
   }
   const handleCloseDialog = async () => {
@@ -340,6 +354,8 @@ export default function Products({ user, products }: Props) {
                     colorScheme="red"
                     onClick={handleDeleteProduct}
                     ml={3}
+                    loadingText="Eliminando"
+                    isLoading={loadingBtn}
                   >
                     Borrar
                   </Button>
