@@ -211,9 +211,10 @@ export default function Products({ user, products }: Props) {
             !noResultsProducts &&
             listProducts.length > 0 &&
             listProducts.map((product) => {
-              const principalImage = product.images.find(
-                (image) => image.principal
-              )
+              let principalImage
+              if (product.images && product.images.length > 0) {
+                principalImage = product.images.find((image) => image.principal)
+              }
               return (
                 <Box
                   key={product._id}
